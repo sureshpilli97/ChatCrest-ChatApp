@@ -1,0 +1,94 @@
+.chat {
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    padding: 10px;
+}
+
+.Msg {
+    background-color: white;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    transition: transform 5.3s;
+}
+
+.Msg input {
+    flex: 1;
+    padding: 5px;
+    margin-right: 10px;
+    border-radius: 20px;
+}
+
+.Msg Button {
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+}
+
+.Msg Button:hover {
+    background-color: #000;
+}
+.Msg input{
+   outline:#000 ; 
+}
+.Msg input:focus {
+    border: 2px solid; 
+    box-shadow: 0 0 10px #000;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+.box-msg {
+    padding: 10px;
+    background-color: #ececec;
+    border-radius: 10px;
+    width: fit-content;
+    padding: 10px;
+    max-width: 70%;
+    margin-bottom: 10px;
+}
+.box-msg-send {
+    margin-left: auto;
+    padding: 10px;
+    width: fit-content;
+    max-width: 70%;
+    background-color: rgb(25, 25, 25);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.message-timestamp {
+    margin-left: 3px;
+    text-align: right;
+    font-size: 10px;
+    color: #888;
+}
+.update{
+    position:'fixed';
+    margin-top: 17%;
+    margin-left: auto;
+    margin-right: auto;
+    color:#000;
+    font-size:24px;
+}
+.imge{
+    position:'fixed';
+    margin-top: 10%;
+    margin-left: auto;
+    margin-right: auto;
+    color:#000;
+    text-align: center;
+    font-family: 'Times New Roman', Times, serif;
+}
+@media ( max-width: 699px){
+    .update{
+        margin-top: 250px;
+        margin-left: 4%;
+        margin-right: auto;
+        font-size:17px;
+    }
+    .imge{
+        margin-top: 250px;
+    }
+}

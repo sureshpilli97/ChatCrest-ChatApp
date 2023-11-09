@@ -4,11 +4,19 @@ import { Box, IconButton } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faComments } from '@fortawesome/free-solid-svg-icons';
 import {Link} from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import "./Css/Chat.css";
 
 const Bottom = () => {
+  const Identifier = uuidv4();
   const receiveChat = () => {
-    fetch("https://suresh28.pythonanywhere.com/receive_data")
+    fetch("https://suresh28.pythonanywhere.com/receive_data",{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Identifier': Identifier,
+      }
+    })
       .then(response => {
         if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -37,14 +45,13 @@ const Bottom = () => {
     });
   }
   const send = (message) => {
-    let curl = window.location.origin;
-    console.log('Current URL:', curl);
     fetch("https://suresh28.pythonanywhere.com/receive_data",{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-Identifier': Identifier,
     },
-    body: JSON.stringify([curl,message]),
+    body: JSON.stringify(message),
   })
     .then(response => {
         if (!response.ok) {
@@ -85,12 +92,11 @@ const Bottom = () => {
   useEffect(() => {
     const intervalId = setInterval(receiveChat, 2000); 
     return () => clearInterval(intervalId);
-  }, []);
+  });
   return (
     <>
       <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
         <Box sx={{ display: 'flex' }} className="Msg">
-          
           <IconButton size="small" color="inherit" onClick={receiveChat} style={{ marginRight: 10 }}>
           <Link to="/" id='nav-name' >
             <FontAwesomeIcon icon={faComments} style={{color: "#ffffff",}} />

@@ -37,7 +37,7 @@ const Bottom = () => {
     });
   }
   const send = (message) => {
-    let curl = window.location.href;
+    let curl = window.location.origin;
     console.log('Current URL:', curl);
     fetch("https://suresh28.pythonanywhere.com/receive_data",{
     method: 'POST',

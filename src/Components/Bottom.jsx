@@ -1,35 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { AppBar, Box, IconButton, Input } from '@mui/material';
+import {React,useEffect} from 'react';
+import {AppBar} from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faComments } from '@fortawesome/free-solid-svg-icons';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import './Chat.css';
+import "./Css/Chat.css";
 
 const Bottom = () => {
   const Identifier = uuidv4();
-
-  const [messages, setMessages] = useState([]);
-  const [messageInput, setMessageInput] = useState('');
-
   const receiveChat = () => {
     fetch(`https://suresh28.pythonanywhere.com/receive_data?identifier=${Identifier}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data !== '') {
-          setMessages([...messages, { content: data, sender: 'other' }]);
-        }
-      })
-      .catch((error) => {
-        console.error('Error receiving message: ' + error);
-      });
-  };
-
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then((data)=>{
+      if(data !== ''){
+        const chatContainer = document.querySelector('.chat');
+        const messageWrapper = document.createElement('div');
+        messageWrapper.classList.add('message-wrapper');
+        const msg = document.createElement('div');
+        msg.textContent = data;
+        msg.classList.add('box-msg');
+        const timestamp = document.createElement('div');
+        const now = new Date();
+        const options = { hour: 'numeric', minute: '2-digit' };
+        const timeString = now.toLocaleTimeString(undefined, options);
+        timestamp.textContent = timeString;
+        timestamp.classList.add('message-timestamp');
+        msg.appendChild(timestamp);
+        messageWrapper.appendChild(msg);
+        chatContainer.appendChild(messageWrapper);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+    })
+    .catch((error) => {
+      console.error('Error receiving message: ' + error);
+    });
+  }
   const send = (message) => {
     fetch('https://suresh28.pythonanywhere.com/receive_data', {
       method: 'POST',
@@ -37,78 +48,68 @@ const Bottom = () => {
         'Content-Type': 'application/json',
         'X-Identifier': Identifier,
       },
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ "message":message }),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(() => {
-        setMessages([...messages, { content: message, sender: 'you' }]);
-        setMessageInput(''); // Clear the message input
-      })
-      .catch((error) => {
-        console.error('Error sending message: ' + error);
-      });
-  };
-
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error('Error sending message: ' + error);
+    });
+    const chatContainer = document.querySelector('.chat');
+    const messageWrapper = document.createElement('div');
+    messageWrapper.classList.add('message-wrapper');
+    const msg = document.createElement('div');
+    msg.textContent = message;
+    msg.classList.add('box-msg-send');
+    const timestamp = document.createElement('div');
+    const now = new Date();
+    const options = { hour: 'numeric', minute: '2-digit' };
+    const timeString = now.toLocaleTimeString(undefined, options);
+    timestamp.textContent = timeString;
+    timestamp.classList.add('message-timestamp');
+    msg.appendChild(timestamp);
+    messageWrapper.appendChild(msg);
+    chatContainer.appendChild(messageWrapper);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
   const handleAddChat = () => {
-    if (messageInput) {
-      send(messageInput);
+    let message = document.querySelector('#msg').value;
+    if (message) {
+      send(message)
+      document.querySelector('#msg').value = '';
     }
   };
-
-  const addChat = (event) => {
+  const addChat = (event) =>{
     if (event.key === 'Enter') {
       event.preventDefault();
       handleAddChat();
     }
-  };
-
+  }
   useEffect(() => {
     const intervalId = setInterval(receiveChat, 2000);
     return () => clearInterval(intervalId);
   }, []);
-
   return (
     <>
-      <div className="chat">
-        {messages.map((message, index) => (
-          <div key={index} className={`message ${message.sender}`}>
-            {message.content}
-          </div>
-        ))}
-      </div>
       <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
         <Box sx={{ display: 'flex' }} className="Msg">
           <IconButton size="small" color="inherit" onClick={receiveChat} style={{ marginRight: 10 }}>
-            <Link to="/" id="nav-name">
-              <FontAwesomeIcon icon={faComments} style={{ color: '#ffffff' }} />
-            </Link>
+          <Link to="/" id='nav-name' >
+            <FontAwesomeIcon icon={faComments} style={{color: "#ffffff",}} />
+          </Link>
           </IconButton>
-          <Input
-            id="msg"
-            name="msg"
-            type="text"
-            placeholder="Type here...."
-            onKeyDown={addChat}
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-          />
-          <IconButton
-            size="small"
-            color="inherit"
-            onClick={handleAddChat}
-            style={{ borderRadius: 20, textAlign: 'center', padding: '8px' }}
-          >
+          <input id='msg' name='msg' type='text' placeholder='Type here....' onKeyDown={addChat} />
+          <IconButton size="small" color="inherit" onClick={handleAddChat}  style={{ borderRadius: 20, textAlign: 'center', padding: "8px" }}>
             <FontAwesomeIcon icon={faPaperPlane} />
           </IconButton>
         </Box>
       </AppBar>
     </>
   );
-};
+}
 
 export default Bottom;

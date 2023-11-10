@@ -10,7 +10,7 @@ import "./Css/Chat.css";
 const Bottom = () => {
 
   const Identifier = uuidv4();
-  const shiftAmount = 7;
+  const shiftAmount = 3;
   const encodeCaesarCipher = (input, shift) => {
     return input
       .split('')

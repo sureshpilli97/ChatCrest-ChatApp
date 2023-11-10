@@ -4,24 +4,58 @@ import { Box, IconButton } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperPlane, faComments } from '@fortawesome/free-solid-svg-icons';
 import {Link} from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import "./Css/Chat.css";
 
 const Bottom = () => {
-  const receiveChat = () => {
-    fetch("https://suresh28.pythonanywhere.com/receive_data")
-      .then(response => {
-        if (!response.ok) {
-        throw new Error('Network response was not ok');
+
+  const Identifier = uuidv4();
+  const shiftAmount = 7;
+  const encodeCaesarCipher = (input, shift) => {
+    return input
+      .split('')
+      .map(char => {
+        if (char.match(/[a-z]/i)) {
+          const code = char.charCodeAt(0);
+          const offset = code < 91 ? 65 : 97;
+          return String.fromCharCode((code - offset + shift) % 26 + offset);
+        } else {
+          return char;
         }
-        return response.json();
+      })
+      .join('');
+  };
+
+  const decodeCaesarCipher = (encoded, shift) => {
+    return encoded
+      .split('')
+      .map(char => {
+        if (char.match(/[a-z]/i)) {
+          const code = char.charCodeAt(0);
+          const offset = code < 91 ? 65 : 97;
+          return String.fromCharCode((code - offset - shift + 26) % 26 + offset);
+        } else {
+          return char;
+        }
+      })
+      .join('');
+  };
+  const receiveChat = () => {
+    fetch(`https://suresh28.pythonanywhere.com/receive_data?identifier=${Identifier}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
     })
     .then((data)=>{
       if(data !== ''){
+        const decoded = decodeCaesarCipher(data, shiftAmount);
         const chatContainer = document.querySelector('.chat');
         const messageWrapper = document.createElement('div');
         messageWrapper.classList.add('message-wrapper');
         const msg = document.createElement('div');
-        msg.textContent = data;
+        msg.textContent = decoded;
         msg.classList.add('box-msg');
         const timestamp = document.createElement('div');
         const now = new Date();
@@ -34,23 +68,29 @@ const Bottom = () => {
         chatContainer.appendChild(messageWrapper);
         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
+    })
+    .catch((error) => {
+      console.error('Error receiving message: ' + error);
     });
   }
   const send = (message) => {
-    let curl = window.location.href;
-    console.log('Current URL:', curl);
-    fetch("https://suresh28.pythonanywhere.com/receive_data",{
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify([curl,message]),
-  })
-    .then(response => {
-        if (!response.ok) {
+    const encoded = encodeCaesarCipher(message, shiftAmount);
+    fetch('https://suresh28.pythonanywhere.com/receive_data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Identifier': Identifier,
+      },
+      body: JSON.stringify({ "message":encoded }),
+    })
+    .then((response) => {
+      if (!response.ok) {
         throw new Error('Network response was not ok');
-        }
-        return response.json();
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      console.error('Error sending message: ' + error);
     });
     const chatContainer = document.querySelector('.chat');
     const messageWrapper = document.createElement('div');
@@ -83,14 +123,13 @@ const Bottom = () => {
     }
   }
   useEffect(() => {
-    const intervalId = setInterval(receiveChat, 2000); 
+    const intervalId = setInterval(receiveChat, 2000);
     return () => clearInterval(intervalId);
   }, []);
   return (
     <>
       <AppBar position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
         <Box sx={{ display: 'flex' }} className="Msg">
-          
           <IconButton size="small" color="inherit" onClick={receiveChat} style={{ marginRight: 10 }}>
           <Link to="/" id='nav-name' >
             <FontAwesomeIcon icon={faComments} style={{color: "#ffffff",}} />

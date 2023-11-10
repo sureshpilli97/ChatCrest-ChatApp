@@ -41,7 +41,7 @@ const Bottom = () => {
       .join('');
   };
   const receiveChat = () => {
-    fetch(`https://suresh28.pythonanywhere.com/receive_data?identifier=${Identifier}`)
+    fetch(`https://suresh28.pythonanywhere.com/receive?identifier=${Identifier}`)
     .then((response) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -75,7 +75,7 @@ const Bottom = () => {
   }
   const send = (message) => {
     const encoded = encodeCaesarCipher(message, shiftAmount);
-    fetch('https://suresh28.pythonanywhere.com/receive_data', {
+    fetch('https://suresh28.pythonanywhere.com/receive', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

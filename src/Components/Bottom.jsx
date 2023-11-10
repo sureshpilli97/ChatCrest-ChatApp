@@ -8,42 +8,10 @@ import { v4 as uuidv4 } from 'uuid';
 import "./Css/Chat.css";
 
 const Bottom = () => {
-
-  const Identifier = uuidv4();
-  const shiftAmount = 7;
-  const encodeCaesarCipher = (input, shift) => {
-    return input
-      .split('')
-      .map(char => {
-        if (char.match(/[a-z]/i)) {
-          const code = char.charCodeAt(0);
-          const offset = code < 91 ? 65 : 97;
-          return String.fromCharCode((code - offset + shift) % 26 + offset);
-        } else {
-          return char;
-        }
-      })
-      .join('');
-  };
-
-  const decodeCaesarCipher = (encoded, shift) => {
-    return encoded
-      .split('')
-      .map(char => {
-        if (char.match(/[a-z]/i)) {
-          const code = char.charCodeAt(0);
-          const offset = code < 91 ? 65 : 97;
-          return String.fromCharCode((code - offset - shift + 26) % 26 + offset);
-        } else {
-          return char;
-        }
-      })
-      .join('');
-  };
   const receiveChat = () => {
-    fetch(`https://suresh28.pythonanywhere.com/receive?identifier=${Identifier}`)
-    .then((response) => {
-      if (!response.ok) {
+    fetch("https://suresh28.pythonanywhere.com/receive_data")
+      .then(response => {
+        if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       return response.json();
@@ -74,17 +42,17 @@ const Bottom = () => {
     });
   }
   const send = (message) => {
-    const encoded = encodeCaesarCipher(message, shiftAmount);
-    fetch('https://suresh28.pythonanywhere.com/receive', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Identifier': Identifier,
-      },
-      body: JSON.stringify({ "message":encoded }),
-    })
-    .then((response) => {
-      if (!response.ok) {
+    let curl = window.location.href;
+    console.log('Current URL:', curl);
+    fetch("https://suresh28.pythonanywhere.com/receive_data",{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify([curl,message]),
+  })
+    .then(response => {
+        if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       return response.json();
